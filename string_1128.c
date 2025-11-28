@@ -1,3 +1,12 @@
+/**
+ * @file string_1128.c
+ * @author Lee Jong Hun (ejonghoon0530@naver.com)
+ * @brief 문자열을 입력받아, 긍정이면 1출력, 부정이면 0출력하는 프로그램
+ * @version 0.1
+ * @date 2025-11-28
+ * */ 
+
+
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
@@ -7,6 +16,13 @@
 //get_response(char *prompt) 구현
 //긍정(YES, yes, Yes, OK, ok, Ok) 부정(NO, no, No)
 
+//배열에 넣어서 풀어도 됨
+
+/**
+ * @brief 문자열을 입력받아, 긍정이면 1출력, 부정이면 0출력하는 함수
+ * @param prompt 문자열
+ * @return int 긍정이면 1, 부정이면 0
+ */
 int get_response(char *prompt){
     if(strcmp(prompt, "YES") == 0 || strcmp(prompt, "yes") == 0 || strcmp(prompt, "Yes") == 0 ||
     strcmp(prompt, "OK") == 0 || strcmp(prompt, "ok") == 0 || strcmp(prompt, "Ok") == 0){
@@ -16,6 +32,7 @@ int get_response(char *prompt){
         return 0;
     }
 }
+
 int main(void){
     char str[80] = {0, };
     gets(str);
@@ -26,7 +43,5 @@ int main(void){
         printf("부정\n");
     }
 
-
-    
     return 0;
 }
