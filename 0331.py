@@ -1,4 +1,5 @@
 import queue
+
 class ArrayQueue:
     def __init__(self, capacity):
         self.capacity = capacity
@@ -31,12 +32,15 @@ class ArrayQueue:
             print(self.array[i % self.capacity], end=' ')
         print("]")
     
+    
 
 class BTNode:
     def __init__(self, elem, left = None, right = None):
         self.data = elem
         self.left = left
         self.right = right
+    def isLeaf(self):
+        return self.left is None and self.right is None
 def preorder(n):
     if n is not None:
         print(n.data, end = ' ')
@@ -74,6 +78,30 @@ def calc_height(n):
     if(hLeft > hRight):
         return hLeft + 1
     else: return hRight + 1
+def evaluate(node):
+    if node is None:
+        return 0
+    elif node.isLeaf():
+        return node.data
+    else:
+        op1 = evaluate(node.left)
+        op2 = evaluate(node.right)
+        if node.data == '+': return op1 + op2
+        elif node.data == '-': return op1 - op2
+        elif node.data == '*': return op1 * op2
+        elif node.data == '/': return op1 / op2
+def buildTree(expr):
+    if len(expr) == 0:
+        return None
+    token = expr.pop()
+    if token in '+-*/':
+        node = BTNode(token)
+        node.right = buildTree(expr)
+        node.left = buildTree(expr)
+        return node
+    else:
+        return BTNode(float(token))
+
     
             
 # d = BTNode('D', None, None)
@@ -131,16 +159,27 @@ def decode(root, code):
         elif c == '-': node = node.right
     return node.data
 
-morseCodeTree = make_morse_tree()
-str = input("입력 문장: ")
-mlist = []
-for ch in str:
-    code = encode(ch)
-    mlist.append(code)
-print("Morse Code: ", mlist)
-print("Decoding: ", end = ' ')
-for code in mlist:
-    ch = decode(morseCodeTree, code)
-    print(ch, end = ' ')
-print()
+# morseCodeTree = make_morse_tree()
+# str = input("입력 문장: ")
+# mlist = []
+# for ch in str:
+#     code = encode(ch)
+#     mlist.append(code)
+# print("Morse Code: ", mlist)
+# print("Decoding: ", end = ' ')
+# for code in mlist:
+#     ch = decode(morseCodeTree, code)
+#     print(ch, end = ' ')
+# print()
 
+
+str = input("입력(후위표기): ")
+expr = str.split()
+root = buildTree(expr)
+print('\n전위순회: ', end = ' ')
+preorder(root)
+print('\n중위순회: ', end = ' ')
+inorder(root)
+print('\n후위순회: ', end = ' ')
+postorder(root)
+print('\n계산결과: ', evaluate(root))
