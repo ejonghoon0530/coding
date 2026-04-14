@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Chab-Chu Minimal</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <style>
+    :root {
+      --chab: #ff4757;
+      --chu: #2e86de;
+      --panel: rgba(0, 0, 0, 0.7);
+    }
+
+    body, html {
+      margin: 0; padding: 0; width: 100%; height: 100%;
+      background: #000; color: #fff; font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    /* 카메라 화면 전체 채우기 */
+    #viewport {
+      position: relative; width: 100vw; height: 100vh;
+      background: #000; display: flex; align-items: center; justify-content: center;
+    }
+
+    canvas {
+      transform: rotateY(180deg);
+      width: 100%; height: 100%;
+      object-fit: cover; /* 여백 없이 꽉 채움 */
+    }
+
+    /* 상단 정보 바: 공간 낭비 최소화 */
+    #overlay-ui {
+      position: absolute; top: 0; left: 0; width: 100%;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 25px; box-sizing: border-box;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+      z-index: 10;
+    }
+
+    #status-text {
+      font-size: 0.9rem; font-weight: bold; letter-spacing: 1px;
+      color: #aaa; text-transform: uppercase;
+    }
+
+    /* 노래 중지 버튼: 우측 상단 배치 */
+    #stop-btn {
+      display: none; padding: 8px 20px;
+      background: var(--chab); color: #fff;
+      border: none; border-radius: 4px; font-weight: bold;
+      cursor: pointer; font-size: 0.8rem;
+    }
+
+    /* 가이드 라인: 매우 얇게 처리 */
+    .pitch-guide {
+      position: absolute; top: 50%; left: 0; width: 100%; height: 1px;
+      background: rgba(255, 255, 255, 0.2); pointer-events: none;
+    }
+
+    /* 성공 시 화면 테두리 강조 */
+    #viewport.unlocked {
+      outline: 5px solid #ff00ff;
+      outline-offset: -5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="viewport">
+    <div id="overlay-ui">
+      <div id="status-text">SYSTEM: STANDBY (CLICK TO START)</div>
+      <button id="stop-btn">STOP MUSIC</button>
+    </div>
+    
+    <div class="pitch-guide"></div>
+    <canvas class="output_canvas"></canvas>
+  </div>
+
+  <script>
+    const viewport = document.getElementById('viewport');
+    const canvasElement = document.getElementsByClassName('output_canvas')[0];
+    const canvasCtx = canvasElement.getContext('2d', { alpha: false });
+    const statusText = document.getElementById('status-text');
+    const stopBtn = document.getElementById('stop-btn');
+
+    let audioStarted = false;
+    let wasFistLeft = false, wasFistRight = false;
+    let isSongPlaying = false;
+    const secretPattern = ['Chab', 'Chu', 'Chab', 'Chab', 'Chu'], userPattern = [];
+    let retrievers = [];
+
+    // 사운드 설정
+    const sampler = new Tone.Sampler({ urls: { "C4": "chab.mp3", "G4": "chu.mp3" } }).toDestination();
+    const songPlayer = new Tone.Player("song.mp3").toDestination();
+
+    function checkPattern(input) {
+      if (isSongPlaying) return;
+      userPattern.push(input);
+      if (userPattern.length > 5) userPattern.shift();
+      if (JSON.stringify(userPattern) === JSON.stringify(secretPattern)) {
+        isSongPlaying = true;
+        viewport.classList.add('unlocked');
+        stopBtn.style.display = 'block';
+        statusText.innerText = "SEQUENCE UNLOCKED";
+        statusText.style.color = "#ff00ff";
+        songPlayer.start();
+      }
+    }
+
+    stopBtn.onclick = (e) => {
+      e.stopPropagation();
+      songPlayer.stop();
+      isSongPlaying = false; retrievers = [];
+      stopBtn.style.display = 'none';
+      viewport.classList.remove('unlocked');
+      statusText.innerText = "CHAB-CHU ACTIVE";
+      statusText.style.color = "#aaa";
+      userPattern = [];
+    };
+
+    function onResults(results) {
+      canvasCtx.save();
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+      if (isSongPlaying) {
+        if (retrievers.length < 20 && Math.random() < 0.3) {
+          retrievers.push({x: Math.random()*canvasElement.width, y: -50, s: Math.random()*10+5});
+        }
+        canvasCtx.font = "50px serif";
+        retrievers.forEach((r, i) => {
+          r.y += r.s;
+          canvasCtx.fillText("🐕", r.x, r.y);
+          if (r.y > canvasElement.height + 50) retrievers.splice(i, 1);
+        });
+      }
+
+      if (results.multiHandLandmarks) {
+        results.multiHandLandmarks.forEach((landmarks) => {
+          const isLeft = landmarks[0].x > 0.5;
+          const y = landmarks[9].y;
+          const pitch = Math.floor((0.5 - y) * 20);
+          const isFist = landmarks[8].y > landmarks[6].y && landmarks[12].y > landmarks[10].y;
+
+          if (isLeft) {
+            if (isFist && !wasFistLeft) { 
+              sampler.triggerAttackRelease(Tone.Frequency("C4").transpose(pitch), "8n"); 
+              checkPattern('Chab'); 
+            }
+            wasFistLeft = isFist;
+            canvasCtx.fillStyle = "#ff4757"; // 단색 Red
+          } else {
+            if (isFist && !wasFistRight) { 
+              sampler.triggerAttackRelease(Tone.Frequency("G4").transpose(pitch), "8n"); 
+              checkPattern('Chu'); 
+            }
+            wasFistRight = isFist;
+            canvasCtx.fillStyle = "#2e86de"; // 단색 Blue
+          }
+          
+          // 인식 포인트: 깔끔한 단색 사각형
+          canvasCtx.fillRect(landmarks[9].x * canvasElement.width - 5, landmarks[9].y * canvasElement.height - 5, 10, 10);
+        });
+      }
+      canvasCtx.restore();
+    }
+
+    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+    hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.6 });
+    hands.onResults(onResults);
+
+    window.onclick = async () => {
+      if (audioStarted) return;
+      try {
+        await Tone.start();
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        await video.play();
+        
+        canvasElement.width = video.videoWidth; 
+        canvasElement.height = video.videoHeight;
+        
+        const camera = new Camera(video, { 
+          onFrame: async () => { await hands.send({ image: video }); }, 
+          width: video.videoWidth, height: video.videoHeight 
+        });
+        camera.start();
+        
+        audioStarted = true;
+        statusText.innerText = "CHAB-CHU ACTIVE";
+      } catch (e) {
+        statusText.innerText = "CAMERA ERROR";
+      }
+    };
+  </script>
+</body>
+</html>
