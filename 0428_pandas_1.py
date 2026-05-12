@@ -264,25 +264,3 @@
 
 # result = pd.DataFrame([sr_add, sr_sub, sr_mul, sr_div], index = ['덧셈', '뺄셈', '곱셈', '나눗셈'])
 # print(result)
-
-import pandas as pd
-import seaborn as sns
-
-titanic = sns.load_dataset('titanic')
-df = titanic.loc[:, ['age', 'fare']]
-print(df.tail())
-print('\n')
-print(type(df))
-print('\n')
-
-addition = df + 10
-print(addition.tail())
-print('\n')
-
-subtraction = addition - df
-print(subtraction.tail())
-print('\n')
-print(type(subtraction))
-
-
-
