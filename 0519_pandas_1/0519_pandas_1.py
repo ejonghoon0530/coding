@@ -135,10 +135,10 @@
 #----------------------------------------------------------------------
 
 #-------------------회귀선이 있는 산점도----------------------  
-import matplotlib.pyplot as plt
-import seaborn as sns
+# import matplotlib.pyplot as plt
+# import seaborn as sns
 
-titanic = sns.load_dataset('titanic')
+# titanic = sns.load_dataset('titanic')
 
 # sns.set_style('darkgrid')
 
@@ -170,11 +170,159 @@ titanic = sns.load_dataset('titanic')
 #----------------------------------------------------------------
 
 #------------------히트맵----------------------
-table = titanic.pivot_table(index = ['sex'], columns = ['class'], aggfunc = 'size')
+# table = titanic.pivot_table(index = ['sex'], columns = ['class'], aggfunc = 'size')
 
-sns.heatmap(table, annot = True, fmt = 'd', linewidth = 0.5, cmap = 'YlGnBu', cbar = False)
+# sns.heatmap(table, annot = True, fmt = 'd', linewidth = 0.5, cmap = 'YlGnBu', cbar = False)
 
-plt.show()
+# plt.show()
 #----------------------------------------------------------------------
+#------------------범주형 데이터의 산점도----------------------
+# sns.set_style('whitegrid')
 
+# fig = plt.figure(figsize = (15, 50))
+# ax1 = fig.add_subplot(1, 2, 1)
+# ax2 = fig.add_subplot(1, 2, 2)
 
+# # sns.stripplot(x = 'class', y = 'age', data = titanic, ax = ax1, hue = 'class')
+# # sns.swarmplot(x = 'class', y = 'age', data = titanic, ax = ax2, hue = 'class')
+
+# sns.stripplot(x = 'class', y = 'age', data = titanic, ax = ax1, hue = 'sex')
+# sns.swarmplot(x = 'class', y = 'age', data = titanic, ax = ax2, hue = 'sex')
+
+# ax1.set_title('Strip plot')
+# ax2.set_title('Swarm plot')
+
+# plt.show()
+#-----------------------막대그래프----------------------------------
+# fig = plt.figure(figsize = (15, 5))
+# ax1 = fig.add_subplot(1, 3, 1)
+# ax2 = fig.add_subplot(1, 3, 2)
+# ax3 = fig.add_subplot(1, 3, 3)
+
+# sns.barplot(x = 'sex', y = 'survived', data = titanic, ax = ax1)
+
+# sns.barplot(x = 'sex', y = 'survived', hue = 'class', data = titanic, ax = ax2)
+
+# sns.barplot(x = 'sex', y = 'survived', hue = 'class', dodge = False, data = titanic, ax = ax3)
+
+# ax1.set_title('titanic survived - sex')
+# ax2.set_title('titanic survived - sex/class')
+# ax3.set_title('titanic survived - sex/class(stacked)')
+
+# plt.show()
+
+#-----------------------------------------------------------------------
+#------------------------빈도그래프------------------------
+
+# fig = plt.figure(figsize = (15, 5))
+# ax1 = fig.add_subplot(1, 3, 1)
+# ax2 = fig.add_subplot(1, 3, 2)
+# ax3 = fig.add_subplot(1, 3, 3)
+
+# sns.countplot(x = 'class', hue = 'who', palette = 'Set1', data = titanic, ax = ax1)
+
+# sns.countplot(x = 'class', hue = 'who', palette = 'Set2', data = titanic, ax = ax2)
+
+# sns.countplot(x = 'class', hue = 'who', palette = 'Set3', dodge = False, data = titanic, ax = ax3)
+
+# ax1.set_title('titanic class')
+# ax2.set_title('titanic class - who')
+# ax3.set_title('titanic class - who (stacked)')
+
+# plt.show()
+
+#-----------------------------------------------------------------------
+#------------------------박스플롯/바이올린 그래프---------------------
+
+# fig = plt.figure(figsize = (15, 5))
+# ax1 = fig.add_subplot(2, 2, 1)
+# ax2 = fig.add_subplot(2, 2, 2)
+# ax3 = fig.add_subplot(2, 2, 3)
+# ax4 = fig.add_subplot(2, 2, 4)
+
+# sns.boxplot(x = 'alive', y = 'age', data = titanic, ax = ax1)
+# sns.boxplot(x = 'alive', y = 'age', hue = 'sex', data = titanic, ax = ax2)
+
+# sns.violinplot(x = 'alive', y = 'age', data = titanic, ax = ax3)
+# sns.violinplot(x = 'alive', y = 'age', hue = 'sex', data = titanic, ax = ax4)
+
+# plt.show()
+
+#-----------------------------------------------------------------------
+#------------------------조인트 그래프-----------------------------
+# j1 = sns.jointplot(x = 'fare', y = 'age', data = titanic)
+
+# j2 = sns.jointplot(x = 'fare', y = 'age', data = titanic, kind = 'reg')
+# j3 = sns.jointplot(x = 'fare', y = 'age', data = titanic, kind = 'hex')
+# j4 = sns.jointplot(x = 'fare', y = 'age', data = titanic, kind = 'kde')
+
+# j1.fig.suptitle('titanic fare - scatter', size = 15)
+# j2.fig.suptitle('titanic fare - reg', size = 15)
+# j3.fig.suptitle('titanic fare - hex', size = 15)
+# j4.fig.suptitle('titanic fare - kde', size = 15)
+
+# plt.show()
+
+#------------------------pairplot------------------------
+
+# titanic_pair = titanic[['age', 'pclass', 'fare']]
+# g = sns.pairplot(titanic_pair)
+# plt.show()
+
+#--------------------------------------------------
+#-------------------Folium 라이브러리------------------------
+
+#import folium
+
+# seoul_map = folium.Map(location = [37.55, 126.98], zoom_start = 12)
+
+# seoul_map.save('C:\\Users\\ejong\\Desktop\\coding\\0519_pandas_1\\seoul_map.html')
+
+#-----------------------------------------------------------------
+# seoul_map2 = folium.Map(location = [37.55, 126.98], tiles = 'OpenstreetMap', zoom_start = 12)
+# seoul_map3 = folium.Map(location = [37.55, 126.98], tiles = 'Cartodb Positron', zoom_start = 10)
+
+# seoul_map2.save('C:\\Users\\ejong\\Desktop\\coding\\0519_pandas_1\\seoul_map2.html')
+# seoul_map3.save('C:\\Users\\ejong\\Desktop\\coding\\0519_pandas_1\\seoul_map3.html')    
+
+#----------------------------------------------------------------------
+# import pandas as pd
+# import folium
+
+# df  = pd.read_excel('C:\\Users\\ejong\\Desktop\\coding\\0513_pandas_1\\서울지역 대학교 위치.xlsx')
+
+# seoul_map = folium.Map(location = [37.55, 126.98], tiles = 'OpenStreetMap', zoom_start = 12)
+
+# # for name, lat, lng in zip(df.학교명, df.위도, df.경도):
+# #     folium.Marker([lat, lng], popup = name).add_to(seoul_map)
+    
+# # seoul_map.save('C:\\Users\\ejong\\Desktop\\coding\\0519_pandas_1\\seoul_map_univ.html')
+
+# for name, lat, lng in zip(df.학교명, df.위도, df.경도):
+#     folium.CircleMarker([lat, lng], radius = 10, color = 'brown', fill = True, fill_color = 'coral', fill_opacity = 0.7, popup = name).add_to(seoul_map)
+# seoul_map.save('C:\\Users\\ejong\\Desktop\\coding\\0519_pandas_1\\seoul_map_univ2.html')
+
+#----------------------------------------------------------------------
+#--------------------지도에 단계구분도 표시하기-----------------------
+import json
+import pandas as pd
+import folium
+
+file_path = 'C:\\Users\\ejong\\Desktop\\coding\\0513_pandas_1\\경기도인구데이터.xlsx'
+df = pd.read_excel(file_path, index_col = '구분', engine = 'openpyxl')
+df.columns = df.columns.map(str)
+geo_path = 'C:\\Users\\ejong\\Desktop\\coding\\0513_pandas_1\\경기도행정구역경계.json'
+
+try:
+    geo_data = json.load(open(geo_path, encoding = 'utf-8'))
+except:
+    geo_data = json.load(open(geo_path, encoding = 'utf-8-sig'))
+    
+g_map = folium.Map(location = [37.5502, 126.982], tiles = 'OpenStreetMap', zoom_start = 9)
+
+year = '2017'
+
+folium.Choropleth(geo_data = geo_data, data = df[year], columns = [df.index, df[year]], fill_color = 'YlOrRd', fill_opacity = 0.7,
+                  line_opacity = 0.3, threshold_scale = [10000, 100000, 300000, 500000, 700000], key_on = 'feature.properties.name',).add_to(g_map)
+g_map.save('C:\\Users\\ejong\\Desktop\\coding\\0519_pandas_1\\gyeonggi_population_'+ year + '.html')
+#----------------------------------------------------------------------
